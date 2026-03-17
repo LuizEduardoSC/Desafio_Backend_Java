@@ -41,11 +41,11 @@ Para rodar o projeto localmente, você vai precisar de:
 
 ### 1. Configure o Banco de Dados
 
-Crie um banco de dados no seu servidor MySQL local chamado `db_acti`. 
+Crie um banco de dados no seu servidor MySQL local chamado `db_parceiros`. 
 Você pode usar o seguinte comando SQL:
 
 ```sql
-CREATE DATABASE db_acti;
+CREATE DATABASE db_parceiros;
 ```
 
 As configurações padrão do banco de dados na aplicação (`application.properties`) assumem as seguintes credenciais locais:
