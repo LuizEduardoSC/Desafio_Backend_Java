@@ -6,14 +6,14 @@ Esta é uma API REST desenvolvida em Java com Spring Boot para gerenciar o cadas
 
 Este projeto foi construído utilizando as seguintes tecnologias:
 
-- **Java 17**
+- **Java 17** (com **Records** para transferência de dados imutável)
 - **Spring Boot 3.5.4**
 - **Maven** (Gerenciamento de dependências e build)
-- **Spring Data JPA & Hibernate** (Mapeamento Objeto-Relacional)
+- **Spring Data JPA & Hibernate** (Mapeamento Objeto-Relacional e criação automática de tabelas)
 - **MySQL** (Banco de Dados Relacional)
 - **Spring Boot Starter Validation** (Validação de dados Jakarta)
-- **Lombok** (Para reduzir boilerplate como Getters, Setters e Construtores)
 - **Integração com API Externa** (via `java.net.http.HttpClient` para a ReceitaWS)
+- **Docker** (Configurado para deploy conteinerizado)
 
 ## ⚙️ Funcionalidades
 
@@ -105,6 +105,20 @@ Content-Type: application/json
   // Adicione os demais campos conforme esperado pela sua classe ParceiroDto
 }
 ```
+
+## ☁️ Deploy (Hospedagem na Nuvem)
+
+O projeto já contém um arquivo `Dockerfile` na raiz, configurado com build *multi-stage* do Maven, o que o torna pronto para deploy em serviços baseados em Container (como **Render, Railway, Fly.io**).
+
+**Para realizar o deploy no [Render.com](https://render.com/):**
+1. Crie um novo **Web Service**.
+2. Conecte o seu repositório do GitHub.
+3. O Render detectará automaticamente o ambiente como **Docker**.
+4. Crie uma instância de Banco de Dados MySQL na mesma plataforma (ou use um servidor externo).
+5. Nos *Settings* do *Web Service*, na aba **Environment Variables**, adicione as seguintes variáveis de ambiente apontando para o seu banco de produção (Isso vai substituir automaticamente as credenciais locais descritas no *application.properties* quando seu app estiver na web):
+   - `SPRING_DATASOURCE_URL` (Ex: `jdbc:mysql://nome-do-host..`)
+   - `SPRING_DATASOURCE_USERNAME`
+   - `SPRING_DATASOURCE_PASSWORD`
 
 ## ✒️ Autores
 
