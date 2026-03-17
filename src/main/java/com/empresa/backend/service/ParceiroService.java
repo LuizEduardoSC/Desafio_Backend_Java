@@ -2,12 +2,13 @@ package com.empresa.backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.empresa.backend.dto.ParceiroDto;
+import com.empresa.backend.entity.Parceiro;
 import com.empresa.backend.exception.ParceiroException;
+import com.empresa.backend.repository.ParceiroRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,27 +17,39 @@ import lombok.extern.slf4j.Slf4j;
 public class ParceiroService {
 
 	@Autowired
-	private JdbcTemplate jdbc;
+	private ParceiroRepository parceiroRepository;
 
 	@Transactional
 	public Long inserirParceiro(ParceiroDto dto) {
-		String sql = "CALL sp_inserir_parceiro(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
 		try {
-			log.info("Cadastrando parceiro: {}", dto.getRazaoSocial());
+			log.info("Cadastrando parceiro: {}", dto.razaoSocial());
+			
+			Parceiro parceiro = new Parceiro();
+			parceiro.setTipoParceiro(dto.tipoParceiro());
+			parceiro.setPersonalidade(dto.personalidade());
+			parceiro.setRazaoSocial(dto.razaoSocial());
+			parceiro.setNomeFantasia(dto.nomeFantasia());
+			parceiro.setCpfCnpj(dto.cpfCnpj().replaceAll("\\D", "")); // Remove pontuação
+			parceiro.setSegmento(dto.segmento());
+			parceiro.setCategoria(dto.categoria());
+			parceiro.setCep(dto.cep().replace("-", "")); // Remove traço
+			parceiro.setPais(dto.pais());
+			parceiro.setUf(dto.uf());
+			parceiro.setMunicipio(dto.municipio());
+			parceiro.setLogradouro(dto.logradouro());
+			parceiro.setNumero(dto.numero());
+			parceiro.setBairro(dto.bairro());
+			parceiro.setComplemento(dto.complemento());
+			parceiro.setObservacao(dto.observacao());
+			parceiro.setEmail(dto.email());
+			parceiro.setTelefone(dto.telefone());
+			parceiro.setCelular(dto.celular());
 
-			jdbc.update(sql, dto.getTipoParceiro(), dto.getPersonalidade(), dto.getRazaoSocial(), dto.getNomeFantasia(),
-					dto.getCpfCnpj().replaceAll("\\D", ""), // Remove pontuação
-					dto.getSegmento(), dto.getCategoria(), dto.getCep().replace("-", ""), // Remove traço
-					dto.getPais(), dto.getUf(), dto.getMunicipio(), dto.getLogradouro(), dto.getNumero(),
-					dto.getBairro(), dto.getEmail(), dto.getTelefone(), dto.getCelular(), dto.getComplemento(),
-					dto.getObservacao());
-
-			// Retorna o ID gerado (ajuste conforme sua procedure)
-			return jdbc.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+			Parceiro salvo = parceiroRepository.save(parceiro);
+			return salvo.getId();
 
 		} catch (DataAccessException e) {
-			log.error("Erro ao cadastrar parceiro: {}", e.getMessage());
+			log.error("Erro ao cadastrar parceiro via JPA: {}", e.getMessage());
 			throw new ParceiroException("Falha no cadastro: " + e.getMostSpecificCause().getMessage());
 		}
 	}
