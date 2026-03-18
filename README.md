@@ -6,11 +6,12 @@ Esta é uma API REST desenvolvida em Java com Spring Boot para gerenciar o cadas
 
 Este projeto foi construído utilizando as seguintes tecnologias:
 
-- **Java 17** (com **Records** para transferência de dados imutável)
+- **Java 21** (com **Records** para transferência de dados imutável)
 - **Spring Boot 3.5.4**
 - **Maven** (Gerenciamento de dependências e build)
 - **Spring Data JPA & Hibernate** (Mapeamento Objeto-Relacional e criação automática de tabelas)
-- **MySQL** (Banco de Dados Relacional)
+- **MySQL** (Banco de Dados para Desenvolvimento Local)
+- **PostgreSQL** (Banco de Dados para Produção/Render)
 - **Spring Boot Starter Validation** (Validação de dados Jakarta)
 - **Integração com API Externa** (via `java.net.http.HttpClient` para a ReceitaWS)
 - **Docker** (Configurado para deploy conteinerizado)
@@ -26,20 +27,20 @@ A API possui dois recursos principais:
 2. **Cadastro de Parceiros** (`POST /api/parceiros`)
    - Recebe os dados de um parceiro para cadastro.
    - Valida as regras de negócio e a integridade dos campos enviados.
-   - Salva o registro no banco de dados MySQL.
+   - Salva o registro no banco de dados (MySQL local ou PostgreSQL em nuvem).
 
 ## 📋 Pré-requisitos
 
 Para rodar o projeto localmente, você vai precisar de:
 
-- **Java 17** (JDK) instalado na sua máquina
+- **Java 21+** (JDK) instalado na sua máquina
 - **Git** para clonar o repositório
 - Um banco de dados **MySQL** rodando localmente (ou em container Docker)
 - Sua IDE favorita (IntelliJ IDEA, Eclipse, VS Code ou Spring Tool Suite)
 
 ## 🔧 Configuração e Instalação
 
-### 1. Configure o Banco de Dados
+### 1. Configure o Banco de Dados Local (MySQL)
 
 Crie um banco de dados no seu servidor MySQL local chamado `db_parceiros`. 
 Você pode usar o seguinte comando SQL:
@@ -54,13 +55,13 @@ As configurações padrão do banco de dados na aplicação (`application.proper
 - **Usuário**: root
 - **Senha**: root
 
-*Se o seu usuário/senha do MySQL forem diferentes, lembre-se de alterar as propriedades `spring.datasource.username` e `spring.datasource.password` no arquivo `src/main/resources/application.properties` antes de rodar o projeto.*
+A aplicação utiliza variáveis de ambiente com valores padrão, permitindo que você altere as credenciais sem modificar o código-fonte.
 
 ### 2. Clone o Repositório
 
 ```bash
-git clone <url-do-repositorio>
-cd Desafio_Backend_Java-main
+git clone https://github.com/LuizEduardoSC/Desafio_Backend_Java.git
+cd Desafio_Backend_Java
 ```
 
 ### 3. Compile e Baixe as Dependências
@@ -98,27 +99,38 @@ POST http://localhost:8080/api/parceiros
 Content-Type: application/json
 
 {
-  "nome": "Empresa Parceira LTDA",
-  "cnpj": "27865757000102",
+  "nome_fantasia": "Empresa Parceira LTDA",
+  "razao_social": "EMPRESA PARCEIRA SERVICOS LTDA",
+  "cpf_cnpj": "27865757000102",
   "email": "contato@empresa.com.br",
-  "telefone": "11999999999"
-  // Adicione os demais campos conforme esperado pela sua classe ParceiroDto
+  "telefone": "11999999999",
+  "celular": "11988888888",
+  "cep": "01001000",
+  "logradouro": "Praça da Sé",
+  "numero": "100",
+  "bairro": "Sé",
+  "municipio": "São Paulo",
+  "uf": "SP",
+  "personalidade": "JURIDICA",
+  "categoria": "SERVICOS",
+  "segmento": "TECNOLOGIA",
+  "tipo_parceiro": "FORNECEDOR"
 }
 ```
 
-## ☁️ Deploy (Hospedagem na Nuvem)
+## ☁️ Deploy e API em Produção
 
-O projeto já contém um arquivo `Dockerfile` na raiz, configurado com build *multi-stage* do Maven, o que o torna pronto para deploy em serviços baseados em Container (como **Render, Railway, Fly.io**).
+A aplicação está hospedada no [Render.com](https://render.com/) utilizando Docker e um banco de dados PostgreSQL.
 
-**Para realizar o deploy no [Render.com](https://render.com/):**
-1. Crie um novo **Web Service**.
-2. Conecte o seu repositório do GitHub.
-3. O Render detectará automaticamente o ambiente como **Docker**.
-4. Crie uma instância de Banco de Dados MySQL na mesma plataforma (ou use um servidor externo).
-5. Nos *Settings* do *Web Service*, na aba **Environment Variables**, adicione as seguintes variáveis de ambiente apontando para o seu banco de produção (Isso vai substituir automaticamente as credenciais locais descritas no *application.properties* quando seu app estiver na web):
-   - `SPRING_DATASOURCE_URL` (Ex: `jdbc:mysql://nome-do-host..`)
-   - `SPRING_DATASOURCE_USERNAME`
-   - `SPRING_DATASOURCE_PASSWORD`
+### 🔗 API Live
+Você pode testar a aplicação rodando na nuvem através do link:
+👉 [https://parceiros-backend-api.onrender.com/api/cnpj/27865757000102](https://parceiros-backend-api.onrender.com/api/cnpj/27865757000102)
+
+### Configuração de Deploy (Render)
+Para replicar o deploy, configure as seguintes **Environment Variables** no seu Web Service:
+- `SPRING_DATASOURCE_URL`: `jdbc:postgresql://HOST_DO_BANCO:5432/db_parceiros`
+- `SPRING_DATASOURCE_USERNAME`: Seu usuário do Postgres
+- `SPRING_DATASOURCE_PASSWORD`: Sua senha do Postgres
 
 ## ✒️ Autores
 
